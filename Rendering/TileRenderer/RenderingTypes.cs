@@ -3,6 +3,7 @@ using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Processing;
+using Mapster.Common.Landmarks;
 
 namespace Mapster.Rendering;
 
@@ -108,7 +109,7 @@ public struct GeoFeature : BaseShape
     public GeoFeature(ReadOnlySpan<Coordinate> c, MapFeatureData feature)
     {
         IsPolygon = feature.Type == GeometryType.Polygon;
-        var naturalKey = feature.Properties.FirstOrDefault(x => x.Key == "natural").Value;
+        var naturalKey = feature.Properties.FirstOrDefault(x => x.Key == Landmarks.natural).Value;
         Type = GeoFeatureType.Unknown;
         if (naturalKey != null)
         {
@@ -202,7 +203,7 @@ public struct PopulatedPlace : BaseShape
         for (var i = 0; i < c.Length; i++)
             ScreenCoordinates[i] = new PointF((float)MercatorProjection.lonToX(c[i].Longitude),
                 (float)MercatorProjection.latToY(c[i].Latitude));
-        var name = feature.Properties.FirstOrDefault(x => x.Key == "name").Value;
+        var name = feature.Properties.FirstOrDefault(x => x.Key == Landmarks.name).Value;
 
         if (feature.Label.IsEmpty)
         {
@@ -224,7 +225,7 @@ public struct PopulatedPlace : BaseShape
             return false;
         }
         foreach (var entry in feature.Properties)
-            if (entry.Key.StartsWith("place"))
+            if (entry.Key == (Landmarks.place))
             {
                 if (entry.Value.StartsWith("city") || entry.Value.StartsWith("town") ||
                     entry.Value.StartsWith("locality") || entry.Value.StartsWith("hamlet"))
@@ -264,11 +265,11 @@ public struct Border : BaseShape
         var foundLevel = false;
         foreach (var entry in feature.Properties)
         {
-            if (entry.Key.StartsWith("boundary") && entry.Value.StartsWith("administrative"))
+            if (entry.Key == Landmarks.boundary && entry.Value.StartsWith("administrative"))
             {
                 foundBoundary = true;
             }
-            if (entry.Key.StartsWith("admin_level") && entry.Value == "2")
+            if (entry.Key == Landmarks.admin && entry.Value == "2")
             {
                 foundLevel = true;
             }
